@@ -1,0 +1,34 @@
+{
+  "name": "langgraph-rag-ollama",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A local RAG chatbot over a website/docs using LangChain.js, LangGraph, and Ollama.",
+  "scripts": {
+    "ingest": "tsx src/index.ts ingest",
+    "query": "tsx src/index.ts query",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@langchain/classic": "^1.0.34",
+    "@langchain/community": "^1.1.29",
+    "@langchain/core": "^1.1.48",
+    "@langchain/langgraph": "^1.3.4",
+    "@langchain/ollama": "^1.2.7",
+    "@langchain/textsplitters": "^1.0.1",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "jsdom": "^29.1.1",
+    "langchain": "^1.4.4"
+  }
+}
