@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A local RAG chatbot over a website/docs using LangChain.js, LangGraph, and Ollama.",
+  "description": "Chat with your PDF — a local RAG bot over a PDF (or website) using LangChain.js, LangGraph, and Ollama.",
   "scripts": {
     "ingest": "tsx src/index.ts ingest",
     "query": "tsx src/index.ts query",
     "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "sample": "node scripts/make-sample-pdf.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -29,6 +30,7 @@
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "jsdom": "^29.1.1",
-    "langchain": "^1.4.4"
+    "langchain": "^1.4.4",
+    "pdf-parse": "^1.1.4"
   }
 }

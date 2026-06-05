@@ -1,27 +1,12 @@
-import { RecursiveUrlLoader } from "@langchain/community/document_loaders/web/recursive_url";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
-import * as cheerio from "cheerio";
 import { config } from "./config";
+import { loadSource } from "./loaders";
 import { makeEmbeddings } from "./models";
 import { saveStore } from "./vectorStore";
 
-function extractText(html: string): string {
-  const $ = cheerio.load(html);
-  $("script, style, noscript, nav, footer, header, svg").remove();
-  return $("body").text().replace(/\s+/g, " ").trim();
-}
-
-export async function ingest(url: string = config.sourceUrl): Promise<void> {
-  console.log(`Crawling ${url} (maxDepth=${config.crawlMaxDepth})...`);
-  const loader = new RecursiveUrlLoader(url, {
-    extractor: extractText,
-    maxDepth: config.crawlMaxDepth,
-    timeout: 10_000,
-    preventOutside: true,
-  });
-  const docs = await loader.load();
-  console.log(`Fetched ${docs.length} page(s).`);
+export async function ingest(source: string = config.source): Promise<void> {
+  const docs = await loadSource(source);
 
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: config.chunkSize,
@@ -29,7 +14,10 @@ export async function ingest(url: string = config.sourceUrl): Promise<void> {
   });
   const chunks = await splitter.splitDocuments(docs);
   if (chunks.length === 0) {
-    throw new Error("No content extracted — check SOURCE_URL and your network connection.");
+    throw new Error(
+      `No text extracted from "${source}". If it's a scanned PDF (just images), ` +
+        "it has no text layer to read.",
+    );
   }
   console.log(`Split into ${chunks.length} chunk(s). Embedding with "${config.embeddingModel}"...`);
 

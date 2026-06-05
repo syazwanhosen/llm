@@ -22,14 +22,23 @@ const GraphState = Annotation.Root({
 type State = typeof GraphState.State;
 
 const NO_CONTEXT_MESSAGE =
-  "I couldn't find anything relevant in the indexed documents.";
+  "I couldn't find anything relevant in the document.";
+
+// A short, human-readable label for where a chunk came from — "page N" for
+// PDFs (PDFLoader sets loc.pageNumber), otherwise the source URL/path.
+export function describeSource(doc: Document): string {
+  const page = doc.metadata?.loc?.pageNumber;
+  if (page) return `page ${page}`;
+  return String(doc.metadata?.source ?? "unknown source");
+}
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
     "system",
-    "You are a helpful assistant answering questions about a set of indexed documents. " +
-      "Use ONLY the context below to answer. If the answer is not in the context, say you " +
-      "don't know — do not make anything up.\n\nContext:\n{context}",
+    "You are a helpful assistant answering questions about a single document. " +
+      "Use ONLY the context below to answer. If the answer is not in the context, " +
+      "say you don't know — do not use outside knowledge or make anything up. " +
+      'Cite the source label (e.g. "page 2") for the facts you use.\n\nContext:\n{context}',
   ],
   ["human", "{question}"],
 ]);
@@ -44,7 +53,9 @@ export function buildGraph(store: MemoryVectorStore) {
   }
 
   async function generate(state: State): Promise<Partial<State>> {
-    const context = state.documents.map((d) => d.pageContent).join("\n\n---\n\n");
+    const context = state.documents
+      .map((d) => `[${describeSource(d)}]\n${d.pageContent}`)
+      .join("\n\n---\n\n");
     const answer = await chain.invoke({ context, question: state.question });
     return { answer };
   }

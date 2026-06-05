@@ -1,0 +1,135 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 7 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 943 >>
+stream
+BT
+/F1 11 Tf
+72 720 Td
+15 TL
+(Acme Corp Remote Work Handbook) Tj
+T*
+(2026 Edition) Tj
+T*
+( ) Tj
+T*
+(Welcome to Acme Corp. This handbook explains our remote work policy. It) Tj
+T*
+(applies to all full-time employees and is reviewed each year by the People) Tj
+T*
+(team.) Tj
+T*
+( ) Tj
+T*
+(1. Eligibility) Tj
+T*
+(Full-time employees become eligible for remote work after their first 90) Tj
+T*
+(days of employment. Contractors and interns require manager approval before) Tj
+T*
+(working remotely.) Tj
+T*
+( ) Tj
+T*
+(2. Remote Schedule) Tj
+T*
+(Employees may work remotely up to 3 days per week. Working remotely for more) Tj
+T*
+(than 3 days in a week requires written approval from your direct manager.) Tj
+T*
+( ) Tj
+T*
+(3. Core Hours) Tj
+T*
+(All employees must be available during core hours of 10:00 AM to 4:00 PM in) Tj
+T*
+(their local time zone. Outside core hours you may arrange your schedule as) Tj
+T*
+(needed to complete your work.) Tj
+T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 6 0 R /Resources << /Font << /F1 7 0 R >> >> >>
+endobj
+6 0 obj
+<< /Length 1024 >>
+stream
+BT
+/F1 11 Tf
+72 720 Td
+15 TL
+(Acme Corp Remote Work Handbook \(continued\)) Tj
+T*
+( ) Tj
+T*
+(4. Equipment and Expenses) Tj
+T*
+(Acme provides a home office equipment stipend of $500 per year. Employees) Tj
+T*
+(may also claim an internet reimbursement of $40 per month with a receipt.) Tj
+T*
+( ) Tj
+T*
+(5. Security) Tj
+T*
+(A company VPN is required when accessing internal systems from home. Using a) Tj
+T*
+(password manager is mandatory. Confidential work must never be done over) Tj
+T*
+(public Wi-Fi networks.) Tj
+T*
+( ) Tj
+T*
+(6. Meetings) Tj
+T*
+(Cameras are optional during video meetings. Meeting recordings are stored) Tj
+T*
+(for 90 days and then automatically deleted.) Tj
+T*
+( ) Tj
+T*
+(7. Time Off) Tj
+T*
+(Employees receive 20 days of paid time off \(PTO\) per year. Please request) Tj
+T*
+(PTO at least 2 weeks in advance through the HR portal.) Tj
+T*
+( ) Tj
+T*
+(8. Contacts) Tj
+T*
+(For technical help, email it-help@acme.example. For policy questions,) Tj
+T*
+(contact the People team at people@acme.example.) Tj
+T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000001241 00000 n 
+0000001367 00000 n 
+0000002443 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+2513
+%%EOF
