@@ -58,7 +58,27 @@ cp .env.example .env   # optional — defaults work out of the box
 A ready-to-use sample PDF ships at `samples/llm-handbook.pdf` (a fictional remote-work
 handbook). Regenerate it any time with `npm run sample`.
 
-## Usage
+## Web UI
+
+For a modern browser experience — drag-and-drop **multiple PDFs**, a chat with **streaming**
+answers, **file + page citations**, and a document manager — start the web server:
+
+```bash
+npm run web        # then open http://localhost:3000
+```
+
+- **Upload:** drag PDFs onto the sidebar (or click) — several at once is fine. Each is read,
+  split, embedded, and appended to the shared vector store.
+- **Chat:** ask in the main panel; answers stream in token by token and show the files and
+  pages they came from (e.g. `report.pdf · page 3`).
+- **Manage:** the sidebar lists each indexed PDF with its page/chunk counts; remove one with
+  the × button, or wipe everything with **Clear all**.
+
+The UI is served by a small [Hono](https://hono.dev) server (`src/server.ts`) that shares the
+same ingestion pipeline, vector store, and grounding as the CLI. Set `PORT` in `.env` to change
+the port.
+
+## Usage (CLI)
 
 **1. Ingest a PDF** (defaults to the bundled sample):
 
@@ -118,8 +138,11 @@ src/
   loaders.ts       load a source → Documents (PDFLoader for files, crawler for URLs)
   ingest.ts        load → split → embed → persist
   vectorStore.ts   JSON persistence for the in-memory vector store
-  graph.ts         the LangGraph RAG state graph (+ page-citation labels)
+  graph.ts         the LangGraph RAG state graph (+ page citations + streaming)
   index.ts         CLI entry point (ingest / query / REPL)
+  server.ts        Hono web server (upload / chat / documents API)
+public/
+  index.html       the web UI (modern single-page app, no build step)
 scripts/
   make-sample-pdf.mjs   generates the bundled sample PDF
 ```

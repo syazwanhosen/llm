@@ -26,3 +26,12 @@ export async function loadStore(
   store.memoryVectors = JSON.parse(raw);
   return store;
 }
+
+// Load the persisted store, or start a fresh empty one if none exists yet.
+// Used by the web server, which appends documents incrementally.
+export async function loadOrCreateStore(
+  embeddings: EmbeddingsInterface,
+  filePath: string,
+): Promise<MemoryVectorStore> {
+  return (await loadStore(embeddings, filePath)) ?? new MemoryVectorStore(embeddings);
+}

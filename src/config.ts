@@ -11,4 +11,5 @@ export const config = {
   chunkOverlap: Number(process.env.CHUNK_OVERLAP ?? 200),
   topK: Number(process.env.TOP_K ?? 4),
   storePath: process.env.STORE_PATH ?? "data/vector-store.json",
+  port: Number(process.env.PORT ?? 3000),
 };

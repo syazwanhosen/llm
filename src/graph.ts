@@ -24,12 +24,20 @@ type State = typeof GraphState.State;
 const NO_CONTEXT_MESSAGE =
   "I couldn't find anything relevant in the document.";
 
-// A short, human-readable label for where a chunk came from — "page N" for
-// PDFs (PDFLoader sets loc.pageNumber), otherwise the source URL/path.
+function basename(p: string): string {
+  return p.split(/[\\/]/).pop() || p;
+}
+
+// A short, human-readable label for where a chunk came from — "<file> · page N"
+// for PDFs (PDFLoader sets loc.pageNumber and we tag the file name), otherwise
+// the source URL/path. With multiple PDFs indexed, the file name disambiguates.
 export function describeSource(doc: Document): string {
-  const page = doc.metadata?.loc?.pageNumber;
+  const meta = doc.metadata ?? {};
+  const page = meta.loc?.pageNumber;
+  const src = meta.source ? basename(String(meta.source)) : null;
+  if (src && page) return `${src} · page ${page}`;
   if (page) return `page ${page}`;
-  return String(doc.metadata?.source ?? "unknown source");
+  return String(meta.source ?? "unknown source");
 }
 
 const prompt = ChatPromptTemplate.fromMessages([
@@ -81,4 +89,37 @@ export function buildGraph(store: MemoryVectorStore) {
     .addEdge("generate", END)
     .addEdge("no_context", END)
     .compile();
+}
+
+export interface StreamedAnswer {
+  sources: string[];
+  stream: AsyncIterable<string>;
+}
+
+// Streaming variant used by the web server: retrieve the top-k chunks, then
+// stream the LLM's tokens (or yield the no-context message when retrieval is
+// empty). The CLI keeps using buildGraph; both share the prompt and grounding.
+export async function streamAnswer(
+  store: MemoryVectorStore,
+  question: string,
+): Promise<StreamedAnswer> {
+  const retriever = store.asRetriever({ k: config.topK });
+  const documents = await retriever.invoke(question);
+
+  if (documents.length === 0) {
+    return {
+      sources: [],
+      stream: (async function* () {
+        yield NO_CONTEXT_MESSAGE;
+      })(),
+    };
+  }
+
+  const sources = [...new Set(documents.map(describeSource))];
+  const context = documents
+    .map((d) => `[${describeSource(d)}]\n${d.pageContent}`)
+    .join("\n\n---\n\n");
+  const chain = prompt.pipe(makeChatModel()).pipe(new StringOutputParser());
+  const stream = await chain.stream({ context, question });
+  return { sources, stream };
 }

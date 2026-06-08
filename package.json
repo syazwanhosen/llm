@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Chat with your PDF — a local RAG bot over a PDF (or website) using LangChain.js, LangGraph, and Ollama.",
   "scripts": {
+    "web": "tsx src/server.ts",
     "ingest": "tsx src/index.ts ingest",
     "query": "tsx src/index.ts query",
     "start": "tsx src/index.ts",
@@ -21,6 +22,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@hono/node-server": "^2.0.4",
     "@langchain/classic": "^1.0.34",
     "@langchain/community": "^1.1.29",
     "@langchain/core": "^1.1.48",
@@ -29,6 +31,7 @@
     "@langchain/textsplitters": "^1.0.1",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
+    "hono": "^4.12.23",
     "jsdom": "^29.1.1",
     "langchain": "^1.4.4",
     "pdf-parse": "^1.1.4"
