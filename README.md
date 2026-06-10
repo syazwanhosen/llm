@@ -60,23 +60,30 @@ handbook). Regenerate it any time with `npm run sample`.
 
 ## Web UI
 
-For a modern browser experience — drag-and-drop **multiple PDFs**, a chat with **streaming**
-answers, **file + page citations**, and a document manager — start the web server:
+For a modern browser experience — drag-and-drop **multiple files** (PDF, DOCX, TXT, MD), a chat
+with **streaming** answers and **cited snippets**, **persisted multi-conversation** history, and a
+document manager — start the web server:
 
 ```bash
 npm run web        # then open http://localhost:3000
 ```
 
-- **Upload:** drag PDFs onto the sidebar (or click) — several at once is fine. Each is read,
-  split, embedded, and appended to the shared vector store.
-- **Chat:** ask in the main panel; answers stream in token by token and show the files and
-  pages they came from (e.g. `report.pdf · page 3`).
-- **Manage:** the sidebar lists each indexed PDF with its page/chunk counts; remove one with
-  the × button, or wipe everything with **Clear all**.
+- **Upload:** drag files onto the sidebar (or click) — **PDF, DOCX, TXT, MD**, several at once.
+  Each shows its own **upload + indexing progress**, then is split, embedded, and appended to the
+  shared vector store. (PDFs keep page numbers; other formats are indexed as text.)
+- **Chat:** ask in the main panel; answers stream in token by token. Each answer shows **citation
+  cards** — the source label, a **"jump to page N"** link that opens the original PDF at that page,
+  and the **exact snippet** the answer drew from (click to expand).
+- **Conversations:** chat history is saved server-side. Use **+ New** to start a chat, click any
+  past chat in the sidebar to resume it, or delete it with the × button.
+- **Manage documents:** the sidebar lists each indexed file with its page/chunk counts; remove one
+  with the × button, or wipe everything with **Clear all**.
 
 The UI is served by a small [Hono](https://hono.dev) server (`src/server.ts`) that shares the
-same ingestion pipeline, vector store, and grounding as the CLI. Set `PORT` in `.env` to change
-the port.
+same ingestion pipeline, vector store, and grounding as the CLI. Uploaded originals are kept under
+`data/uploads/` (to power the jump-to-page link) and chat history under `data/conversations.json`.
+Set `PORT` in `.env` to change the port. Retrieval is single-turn and stays grounded — history is
+for replay, not extra context.
 
 ## Usage (CLI)
 
@@ -128,6 +135,18 @@ All settings are environment variables (see `.env.example`):
 | `CHUNK_OVERLAP`    | `200`                       | Overlap between chunks                               |
 | `TOP_K`            | `4`                         | Chunks retrieved per question                        |
 | `STORE_PATH`       | `data/vector-store.json`    | Where the vector store is persisted                  |
+| `PORT`             | `3000`                      | Web UI server port (`npm run web`)                   |
+
+## Deploy (free, self-hosted — no API keys)
+
+Two **100% free** hosting paths, both keeping everything local (app + Ollama + models):
+
+- **[Hugging Face Spaces](HF_DEPLOY.md)** (Docker, free CPU) — no VM and a public URL in minutes;
+  the whole stack runs in one container ([`deploy/huggingface/`](deploy/huggingface)). Best for a
+  quick public demo. Caveats: sleeps when idle, storage is ephemeral, CPU is slow (defaults to a
+  small `llama3.2:1b` model).
+- **[Oracle Cloud Always Free](DEPLOY.md)** (Arm VM, 24 GB RAM) — always-on with persistent storage;
+  uses the repo's `Dockerfile` + `docker-compose.yml` (`docker compose up -d --build`).
 
 ## Project structure
 
@@ -135,12 +154,13 @@ All settings are environment variables (see `.env.example`):
 src/
   config.ts        env-driven configuration
   models.ts        Ollama chat model + embeddings factories
-  loaders.ts       load a source → Documents (PDFLoader for files, crawler for URLs)
+  loaders.ts       source → Documents: PDF/DOCX/TXT/MD uploads, files, or URL crawl
   ingest.ts        load → split → embed → persist
   vectorStore.ts   JSON persistence for the in-memory vector store
-  graph.ts         the LangGraph RAG state graph (+ page citations + streaming)
+  graph.ts         the LangGraph RAG state graph (+ cited snippets/pages + streaming)
+  conversations.ts server-side chat-history persistence (multiple conversations)
   index.ts         CLI entry point (ingest / query / REPL)
-  server.ts        Hono web server (upload / chat / documents API)
+  server.ts        Hono web server (upload / chat / documents / conversations / files)
 public/
   index.html       the web UI (modern single-page app, no build step)
 scripts/

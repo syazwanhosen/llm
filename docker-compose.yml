@@ -1,0 +1,53 @@
+# 100%-free self-host: your app + a local Ollama. No API keys, no per-token cost.
+#
+#   docker compose up -d --build      # first run pulls ~5 GB of models — be patient
+#   # then open http://<server-ip>
+#
+# Sized for Oracle Cloud "Always Free" (Arm A1, up to 24 GB RAM). See DEPLOY.md.
+
+services:
+  ollama:
+    image: ollama/ollama
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama            # cache pulled models across restarts
+    # On a GPU host, uncomment to use the GPU:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{ capabilities: ["gpu"] }]
+
+  # One-shot helper: pull the two models on first boot (a no-op once cached).
+  ollama-pull:
+    image: ollama/ollama
+    depends_on: [ollama]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint:
+      - sh
+      - -c
+      - >
+        until ollama list >/dev/null 2>&1; do echo "waiting for ollama..."; sleep 2; done;
+        ollama pull llama3.1 && ollama pull nomic-embed-text
+    restart: "no"
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_started
+      ollama-pull:
+        condition: service_completed_successfully
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - CHAT_MODEL=llama3.1
+      - EMBEDDING_MODEL=nomic-embed-text
+      - PORT=3000
+    volumes:
+      - ./data:/app/data                # persist the vector store + uploaded index
+    ports:
+      - "80:3000"                       # visit http://<server-ip>  (see DEPLOY.md for HTTPS)
+
+volumes:
+  ollama:

@@ -91,9 +91,37 @@ export function buildGraph(store: MemoryVectorStore) {
     .compile();
 }
 
+// A single cited source: the label plus the exact snippet the answer drew from,
+// and enough metadata for the UI to render a "jump to page" link.
+export interface SourceRef {
+  docId: string | null;
+  source: string;
+  page: number | null;
+  label: string;
+  snippet: string;
+}
+
 export interface StreamedAnswer {
-  sources: string[];
+  sources: SourceRef[];
   stream: AsyncIterable<string>;
+}
+
+function makeSnippet(text: string): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  return clean.length > config.snippetMaxChars
+    ? clean.slice(0, config.snippetMaxChars).trimEnd() + "…"
+    : clean;
+}
+
+function toSourceRef(doc: Document): SourceRef {
+  const meta = doc.metadata ?? {};
+  return {
+    docId: (meta.docId as string | undefined) ?? null,
+    source: meta.source ? basename(String(meta.source)) : "unknown source",
+    page: (meta.loc?.pageNumber as number | undefined) ?? null,
+    label: describeSource(doc),
+    snippet: makeSnippet(doc.pageContent),
+  };
 }
 
 // Streaming variant used by the web server: retrieve the top-k chunks, then
@@ -115,7 +143,17 @@ export async function streamAnswer(
     };
   }
 
-  const sources = [...new Set(documents.map(describeSource))];
+  // One SourceRef per retrieved chunk, de-duplicated by doc + page + snippet
+  // prefix so two distinct snippets on the same page both survive.
+  const seen = new Set<string>();
+  const sources: SourceRef[] = [];
+  for (const ref of documents.map(toSourceRef)) {
+    const key = `${ref.docId}|${ref.page}|${ref.snippet.slice(0, 80)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    sources.push(ref);
+  }
+
   const context = documents
     .map((d) => `[${describeSource(d)}]\n${d.pageContent}`)
     .join("\n\n---\n\n");

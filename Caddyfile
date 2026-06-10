@@ -1,0 +1,16 @@
+# OPTIONAL — free HTTPS. Requires a hostname pointing at this server's public IP.
+# A free one works great: create a subdomain at https://www.duckdns.org and point
+# it at your IP. Then swap the address below and enable the `caddy` service as
+# described in DEPLOY.md → "Add free HTTPS + a password". Caddy fetches a free
+# Let's Encrypt certificate automatically and streams the chat (SSE) fine.
+
+your-subdomain.duckdns.org {
+    reverse_proxy app:3000
+
+    # The app has no auth of its own, so add a password gate here. Generate a hash:
+    #   docker run --rm caddy caddy hash-password --plaintext 'your-password'
+    # then uncomment and paste it below:
+    # basic_auth {
+    #     admin <paste-bcrypt-hash-here>
+    # }
+}

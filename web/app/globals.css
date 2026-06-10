@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (toggled on <html>) instead of the media default. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    @apply bg-zinc-50 text-zinc-900 antialiased;
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+  .dark body {
+    @apply bg-zinc-950 text-zinc-100;
+  }
+
+  /* Minimal, unobtrusive scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(212 212 216) transparent;
+  }
+  .dark * {
+    scrollbar-color: rgb(63 63 70) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-zinc-300;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700;
+  }
+}
+
+/* Blinking caret shown while the answer streams in. */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.caret {
+  display: inline-block;
+  width: 0.5ch;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  animation: caret-blink 1s steps(2) infinite;
+}

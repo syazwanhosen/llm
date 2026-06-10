@@ -11,5 +11,9 @@ export const config = {
   chunkOverlap: Number(process.env.CHUNK_OVERLAP ?? 200),
   topK: Number(process.env.TOP_K ?? 4),
   storePath: process.env.STORE_PATH ?? "data/vector-store.json",
+  uploadsPath: process.env.UPLOADS_PATH ?? "data/uploads",
+  conversationsPath: process.env.CONVERSATIONS_PATH ?? "data/conversations.json",
+  snippetMaxChars: Number(process.env.SNIPPET_MAX_CHARS ?? 400),
+  maxUploadMb: Number(process.env.MAX_UPLOAD_MB ?? 25),
   port: Number(process.env.PORT ?? 3000),
 };
